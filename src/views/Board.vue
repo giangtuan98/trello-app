@@ -1,31 +1,54 @@
 <template>
   <div class="board">
     <div class="flex flex-row items-start">
-      <div class="column">
-        <div class="flex items-center mb-2 font-bold"></div>
-      </div>
+      <BoardColumn
+        v-for="(column, $columnIndex) in board.columns"
+        :key="$columnIndex"
+        :column="column"
+        :columnIndex="$columnIndex"
+        :board="board"
+      ></BoardColumn>
+
+      <CreateColumn></CreateColumn>
+    </div>
+
+    <div class="task-bg" v-if="isTaskOpen" @click.self="close">
+      <router-view @closeTask="close"></router-view>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
+import BoardColumn from '../components/BoardColumn'
+import CreateColumn from '../components/CreateColumn'
 
 export default {
-  computed: mapState(["board"]),
-};
+  components: {
+    BoardColumn,
+    CreateColumn
+  },
+  data() {
+    return {
+      newColumnName: ''
+    }
+  },
+  computed: {
+    ...mapState(['board']),
+
+    isTaskOpen() {
+      return this.$route.name === 'task'
+    }
+  },
+  methods: {
+    close() {
+      this.$router.push({ name: 'board' })
+    }
+  }
+}
 </script>
 
 <style lang="css">
-.task {
-  @apply flex items-center flex-wrap shadow mb-2 py-2 px-2 rounded bg-white text-grey-darkest no-underline;
-}
-
-.column {
-  @apply bg-grey-light p-2 mr-4 text-left shadow rounded;
-  min-width: 350px;
-}
-
 .board {
   @apply p-4 bg-teal-dark h-full overflow-auto;
 }
